@@ -19,7 +19,14 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test)/})
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "json"
+
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "minitest", "~> 2.5"
+  spec.add_development_dependency "minitest", "~> 4.4"
+  spec.add_development_dependency "minitest-matchers"
+  spec.add_development_dependency "pry"
+  spec.add_development_dependency "pry-doc"
+  spec.add_development_dependency "pry-stack_explorer"
+  spec.add_development_dependency "pry-debugger"
 end
