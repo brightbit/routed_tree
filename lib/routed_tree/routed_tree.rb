@@ -197,6 +197,21 @@ class RoutedTree
   end
 
   def child_keys
-    routes && routes.keys.reject { |k| k.to_s =~ /^_/ } || []
+    if !routes
+      []
+    else
+      routes.keys.select do |k|
+        k.to_s !~ /^_/ &&
+
+        # Only include keys that contain real content
+        #   (in case of mappings for which this instance provides no
+        #    applicable content)
+        self[k] && (
+          !self[k].respond_to?(:contents) ||
+          self[k].contents                ||
+          self[k].hash_like? && self[k].keys.any?
+        )
+      end
+    end
   end
 end

@@ -110,6 +110,7 @@ describe RoutedTree do
         map 'branch_1/virtual2' => ['branch_1/subbranch2', 'branch_1/array_two/0']
         map 'branch_1/virtual3' => ['branch_1/nonexistent', 'branch_1/subbranch2/subbranch3']
         map 'branch_1/virtual4' => ['branch_1/non/existent', 'branch_1/subbranch2/subbranch3']
+        map 'empty/virtual/key' => ['branch_1/non/existent', 'branch_1/also/non/existent']
       end
 
       def symbol_key(*args)
@@ -231,7 +232,7 @@ describe RoutedTree do
       {
         custom_class: {
           alias_route: { c: :C, d: :D, subbranch3: [1, 2, 3] },
-          symbol_route: { a: :A, b: :B, subbranch3: nil },
+          symbol_route: { a: :A, b: :B },
         },
         hash_one: { a: :A, b: :B },
         array_one: [:a, :b, :c],
