@@ -46,6 +46,24 @@ class RoutedTree
       keys.inject(routes) { |memo, key| memo && memo[key] }
     end
 
+    def class_factory(config)
+      ->(*args){ config[:_to].new(*args) }
+    end
+
+    def class_factory?(config)
+      config[:_to].respond_to?(:new) &&
+        class_factory(config)
+    end
+
+    def callable_factory(config)
+      config[:_to]
+    end
+
+    def callable_factory?(config)
+      config[:_to].respond_to?(:call) &&
+        callable_factory(config)
+    end
+
     def symbol_factory(config)
       ->(*args){
         # Will crash & burn unless last arg is a hash
@@ -57,6 +75,10 @@ class RoutedTree
           contents
         end
       }
+    end
+
+    def symbol_factory?(config)
+      config[:_to].is_a?(Symbol) && symbol_factory(config)
     end
 
     def alias_factory(config)
@@ -87,23 +109,22 @@ class RoutedTree
       }
     end
 
+    def alias_factory?(config)
+      (config[:_to].is_a?(Array) || config[:_to].is_a?(String)) &&
+        alias_factory(config)
+    end
+
     def factory_with(config)
       config[:_class] ||= child_class
 
-      if config[:_to].respond_to?(:new)
-        ->(*args){ config[:_to].new(*args) }
-      elsif config[:_to].respond_to?(:call)
-        config[:_to]
-      elsif config[:_to].is_a? Symbol
-        symbol_factory(config)
-      elsif config[:_to].is_a?(Array) || config[:_to].is_a?(String)
-        alias_factory(config)
-      else
-        ->(*args){ config[:_class].new(*args) }
-      end
+      class_factory?(config)    ||
+      callable_factory?(config) ||
+      symbol_factory?(config)   ||
+      alias_factory?(config)    ||
+      ->(*args){ config[:_class].new(*args) }
     end
 
-    def config_for_path(*path)
+    def config_for(*path)
       parts = path.map do |part|
         if part.is_a?(String)
           part.split('/').map(&:to_sym)
@@ -122,8 +143,9 @@ class RoutedTree
     end
 
     def factory_for(*path)
-      c = config_for_path(*path)
-      c && factory_with(c)
+      if (config = config_for(*path))
+        factory_with(config)
+      end
     end
   end
 end
