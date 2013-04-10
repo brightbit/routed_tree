@@ -33,13 +33,15 @@ class RoutedTree
   end
 
   def key_transform(key)
-    #override this to convert keys to a different format on read.
+    # Override to customize translation of keys from external format
+    #   to internally stored format
     key
   end
 
   def key_untransform(key)
-    #override this to convert keys to a different format on read.
-    key
+    # Override to customize translation of keys from internally store format
+    #   to external format
+    key.intern
   end
 
   def internal_key(key)
@@ -117,13 +119,11 @@ class RoutedTree
       raise NoMethodError.new("cannot call `keys' on #{self}, since it does not wrap a hash")
     else
       [].tap do |ret|
-        if routes
-          ret.concat(child_keys)
-        end
+        ret.concat(child_keys) if routes
         if contents.respond_to?(:keys)
           ret.concat(contents.keys.map { |k| key_untransform(k) })
         end
-      end
+      end.uniq
     end
   end
 

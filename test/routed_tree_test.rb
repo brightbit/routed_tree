@@ -1,12 +1,6 @@
 require_relative 'test_helper'
 require 'routed_tree'
 
-# Reverse environment configuration
-RoutedTree.config do
-  def key_transform(k);   k; end
-  def key_untransform(k); k; end
-end
-
 describe RoutedTree do
   before do
     @routree = RoutedTree[
@@ -134,7 +128,7 @@ describe RoutedTree do
       @routree = CustomRoutedTree1[
         hash_one: { a: :A, b: :B },
         array_one: [:a, :b, :c],
-        branch_1: {
+        'branch_1' => {
           subbranch2: {
             c: :C, d: :D,
             subbranch3: [1, 2, 3]
@@ -176,7 +170,7 @@ describe RoutedTree do
     end
 
     it "implements Enumerable on hashes in subclasses" do
-      @routree[:branch_1][:subbranch2].map{ |_, v| v.class }.last.must_equal CustomRoutedTree3
+      @routree[:branch_1][:subbranch2].map{ |_, v| v.class }.must_include CustomRoutedTree3
     end
 
     it "calls configured lambda for respective key" do
