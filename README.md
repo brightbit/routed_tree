@@ -1,6 +1,7 @@
-# RoutedTree
+# RoutedTree [![Build Status](https://travis-ci.org/brightbit/routed_tree.png)](https://travis-ci.org/brightbit/routed_tree)
 
-TODO: Write a gem description
+A convenince wrapper for trees (nested hashes and/or arrays of hashes and/or arrays)
+that lets you reorganize access to underlying data with "routing" rules.
 
 ## Installation
 
