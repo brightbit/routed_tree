@@ -274,7 +274,6 @@ describe RoutedTree do
         # borrowed from ActiveSupport #underscore implementation
         key.to_s.dup.tap do |ret|
           ret.gsub!(/::/, '/')
-          ret.gsub!(/(?:([A-Za-z\d])|^)(zorg)(?=\b|[^a-z])/) { "#{$1}#{$1 && '_'}#{$2.downcase}" }
           ret.gsub!(/([A-Z\d]+)([A-Z][a-z])/,'\1_\2')
           ret.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
           ret.tr!("-", "_")
