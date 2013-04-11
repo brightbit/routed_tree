@@ -91,16 +91,22 @@ class RoutedTree
         ancestor = ancestor.parent while ancestor.full_route.any?
 
         dest_paths.each do |dest_path|
-          dest_path = dest_path.split('/').map(&:intern)
+          dest_path = dest_path.split('/').map do |k|
+            /^\d+$/ === k ? k.to_i : k.intern
+          end
 
           # Trim parent root path from configured destination
           #
           # Will crash & burn unless last arg is a hash
           #   containing a :parent member
-          if ancestor.contents(*dest_path)
+          if (contents = ancestor.contents(*dest_path))
             # construct with substitute path
-            options[:contents] = ancestor.contents(*dest_path)
-            ret = config[:_class].new(*args)
+            ret = if contents.is_a?(Enumerable)
+              options[:contents] = contents
+              config[:_class].new(*args)
+            else
+              contents
+            end
             break
           end
         end

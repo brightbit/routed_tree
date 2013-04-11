@@ -94,6 +94,7 @@ describe RoutedTree do
         map 'branch_1/subbranch2' => CustomRoutedTree2
         map 'custom_class/symbol_route' => :symbol_key_hash,                       class: CustomRoutedTree2
         map 'custom_class/alias_route' => ['non/existent', 'branch_1/subbranch2'], class: CustomRoutedTree2
+        map 'custom_class/array_index/alias_route' => 'deeper_array/0/c'
         map('lambda') { 'results' }
         map('deeper/lambda') { 'deeper' }
         map 'symbol_key' => :symbol_key
@@ -222,10 +223,15 @@ describe RoutedTree do
       @routree[:custom_class][:alias_route][:c].must_equal :C
     end
 
+    it "can follow aliases with array indexes" do
+      @routree[:custom_class][:array_index][:alias_route].must_equal :C
+    end
+
     def expected_serialized_routree
       {
         custom_class: {
           alias_route: { c: :C, d: :D, subbranch3: [1, 2, 3] },
+          array_index: { alias_route: :C },
           symbol_route: { a: :A, b: :B },
         },
         hash_one: { a: :A, b: :B },
