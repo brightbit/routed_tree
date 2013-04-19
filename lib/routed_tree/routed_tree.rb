@@ -48,11 +48,15 @@ class RoutedTree
     key.is_a?(Integer) ? key : key_transform(key)
   end
 
+  def memo
+    @memo ||= {}
+  end
+
   def [](*keys)
     # Don't use ||= here. @memo[key] could contain something falsey.
-    return @memo[keys] if @memo.has_key?(keys)
+    return memo[keys] if memo.has_key?(keys)
 
-    @memo[keys] = case
+    memo[keys] = case
     when (factory = router.factory_for(*full_route, *keys))
       factory.(*keys, parent: self)
     when contents(*keys).is_a?(Enumerable)
