@@ -20,6 +20,31 @@ describe RoutedTree do
     ]
   end
 
+  it "Reports array-like duck-typing with acts_like?" do
+    [
+      @routree[:array_one],
+      @routree[:deeper_array],
+      @routree[:deeper_hash][:array_two]
+    ].each do |thing|
+      thing.acts_like?(:array).must_equal true
+      thing.acts_like?(:hash).must_equal false
+      thing.acts_like?(:date).must_equal false
+    end
+  end
+
+  it "Reports hash-like duck-typing with acts_like?" do
+    [
+      @routree,
+      @routree[:hash_one],
+      @routree[:deeper_hash],
+      @routree[:deeper_hash][:hash_two]
+    ].each do |thing|
+      thing.acts_like?(:hash).must_equal true
+      thing.acts_like?(:array).must_equal false
+      thing.acts_like?(:date).must_equal false
+    end
+  end
+
   it "Provides access to hash contents" do
     @routree[:one].must_equal   1
     @routree[:two].must_equal   2

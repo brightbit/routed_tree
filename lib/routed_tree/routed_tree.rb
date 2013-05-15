@@ -104,12 +104,12 @@ class RoutedTree
   include Enumerable
 
   def each
-    if hash_like?
+    if acts_like?(:hash)
       keys.each do |key|
         ukey = key_untransform(key)
         yield ukey, self[ukey]
       end
-    elsif array_like?
+    elsif acts_like?(:array)
       contents.each_index { |i| yield self[i] }
     end
   end
@@ -119,7 +119,7 @@ class RoutedTree
   end
 
   def keys
-    if !hash_like?
+    if !acts_like?(:hash)
       raise NoMethodError.new("cannot call `keys' on #{self}, since it does not wrap a hash")
     else
       [].tap do |ret|
@@ -132,7 +132,7 @@ class RoutedTree
   end
 
   def serializeable_array
-    return nil unless array_like?
+    return nil unless acts_like?(:array)
 
     [].tap do |ret|
       each do |item|
@@ -146,7 +146,7 @@ class RoutedTree
   end
 
   def serializeable_hash
-    return nil unless hash_like?
+    return nil unless acts_like?(:hash)
 
     {}.tap do |ret|
       each do |k, v|
@@ -167,12 +167,18 @@ class RoutedTree
     JSON.dump serializeable
   end
 
-  def array_like?
+  def acts_like_array?
     @contents.is_a?(Array)
   end
 
-  def hash_like?
-    !array_like? && (@contents.respond_to?(:keys) || child_keys.count > 0)
+  def acts_like_hash?
+    !acts_like?(:array) && (@contents.respond_to?(:keys) || child_keys.count > 0)
+  end
+
+  def acts_like?(type)
+    m = "acts_like_#{type}?".downcase
+
+    respond_to?(m) && send(m)
   end
 
   def method_missing(method, *args)
@@ -186,7 +192,7 @@ class RoutedTree
 
   def respond_to?(method)
     if [:keys, :has_key?].include?(method)
-      hash_like?
+      acts_like?(:hash)
     else
       super || contents.respond_to?(method)
     end
@@ -213,7 +219,7 @@ class RoutedTree
         self[k] && (
           !self[k].respond_to?(:contents) ||
           self[k].contents                ||
-          self[k].hash_like? && self[k].keys.any?
+          self[k].acts_like?(:hash) && self[k].keys.any?
         )
       end
     end
