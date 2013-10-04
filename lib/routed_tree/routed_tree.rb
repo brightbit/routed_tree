@@ -69,10 +69,9 @@ class RoutedTree
   def contents(*keys)
     [*keys].inject(@contents) do |memo, key|
       begin
-        memo &&
-        if memo.is_a?(Array)
+        if memo.is_a? Array
           memo[key.to_i]
-        else
+        elsif memo.respond_to? :keys
           # Yuck. Need to normalize keys for comparison.
           memo[key_transform(key)] || memo[key.to_s] || memo[key.to_sym]
         end
